@@ -14,7 +14,9 @@ class AuthController extends Controller {
             'email'=>'required|string|unique:users,email',
             'password'=>'required|string',
             'name' => 'required:string',
-            'phone' => 'required:string'
+            'phone' => 'required:string',
+            'code'=>'required:string',
+            'business_id'=> 'required:integer'
         ] );
 
         $user = User::create( [
@@ -22,7 +24,10 @@ class AuthController extends Controller {
             'password'=>bcrypt( $fields[ 'password' ] ),
             'name' => $fields[ 'name' ],
             'phone' => $fields[ 'phone' ],
-            'role' => 'admin'
+            'role' => 'admin',
+            'code'=> $fields[ 'code' ],
+            'business_id'=> $fields[ 'business_id' ],
+            'active_status' => 1
         ] );
 
         $token = $user->createToken( 'wetrack' )->plainTextToken;
@@ -47,6 +52,8 @@ class AuthController extends Controller {
 
         //get user where email is equal to requested email
         $user = User::where( 'email', $fields[ 'email' ] )
+        ->join( 'businesses', 'users.business_id', '=', 'businesses.id' )
+        ->select( 'users.*', 'businesses.name as business_name' )
         ->first();
 
         //check password

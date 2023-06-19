@@ -22,7 +22,10 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
-        'role'
+        'role',
+        'code',
+        'business_id',
+        'active_status'
     ];
 
     /**
@@ -50,9 +53,19 @@ class User extends Authenticatable
         return $this->hasMany(Customer::class);
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function teams()
     {
         return $this->belongsToMany(Team::class, 'team_users');
+    }
+
+    public function businesses()
+    {
+        return $this->belongsTo(Business::class);
     }
 
 }

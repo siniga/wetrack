@@ -28,10 +28,18 @@ class OrderController extends Controller {
     * Store a newly created resource in storage.
     */
 
-    public function getByBusinessId( $status, $bid ) {
-        $orders = Order::with( 'customer' )
+    public function getByStatusBusinessId( $status, $bid ) {
+        $orders = Order::with( 'customer','user' )
         ->where( 'business_id', $bid )
         ->where( 'status', $status )
+        ->get();
+
+       return response( [ 'order'=> $orders ], 201 );
+    }
+
+    public function getOrderByBusinessId( $bid ) {
+        $orders = Order::with( 'customer','user' )
+        ->where( 'business_id', $bid )
         ->get();
 
        return response( [ 'order'=> $orders ], 201 );

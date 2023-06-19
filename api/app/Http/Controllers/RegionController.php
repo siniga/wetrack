@@ -13,7 +13,8 @@ class RegionController extends Controller
      */
     public function index()
     {
-        //
+       $regions = Region::get();
+       return response()->json($regions, 200);
     }
 
     /**

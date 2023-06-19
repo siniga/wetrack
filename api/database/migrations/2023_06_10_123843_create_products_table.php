@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('price');
             $table->string('img')->nullable();
             $table->integer('stock');
-            $table->string('sku');
+            $table->string('sku')->nullable();
+            $table->unsignedBigInteger('business_id');
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->timestamps();

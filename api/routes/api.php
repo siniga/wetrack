@@ -27,21 +27,39 @@ Route::get('/clear-config-cache', function () {
     return 'Config cache has clear successfully !';
 });
 
+//auth routes
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');
 
 Route::group(['middleware' => ['auth:sanctum']], function(){
 
+//reports
+Route::get('/reports/business/{businessId}','ReportController@getReports');
+     
+//teams routes
+Route::get('/regions', 'RegionController@index');
+
+//visits
+Route::get('/visits/business/{businessId}','CustomerVisitController@getVisitsByBusinessId');
+Route::post('/visits','CustomerVisitController@store');
+
 //teams routes
 Route::get('/teams/business/{businessId}', 'TeamController@getTeamsByBusinessId');
+Route::post('/teams', 'TeamController@store');
+Route::post('/teams/assign/supervisor', 'TeamController@assignSupervisor');
 
 //users routes
+Route::get('/users/business/{businessId}', 'UserController@index');
+Route::get('/users/{id}', 'UserController@show');
+Route::post('/users', 'UserController@store');
+Route::put('/users/{user}', 'UserController@update');
+Route::post('/users/update-password', 'UserController@updatePassword');
 Route::get('/users/team/{teamId}/role/{role}', 'UserController@getUsersByteamId');
-
+Route::get('/users/role/{role}/business/{businessId}', 'UserController@getUsersByRoleId');
 
 //orders routes
 Route::get('/orders', 'OrderController@index');
-Route::get('/orders/status/{status}/business/{businessId}', 'OrderController@getByBusinessId');
+Route::get('/orders/business/{businessId}', 'OrderController@getOrderByBusinessId');
 Route::post('/orders', 'OrderController@store');
 Route::get('/orders/{order}', 'OrderController@show');
 Route::put('/orders/{order}', 'OrderController@update');
@@ -49,9 +67,14 @@ Route::delete('/orders/{order}', 'OrderController@destroy');
 
 //categories routes
 Route::get('/categories/business/{businessId}', 'CategoryController@getCategoriesByBusinessId');
+Route::post('/categories', 'CategoryController@store');
+
 
 //products routes
 Route::get('/products/category/{categoryId}', 'ProductController@getProductsByCategoryId');
+Route::get('/products/business/{businessId}', 'ProductController@getProductsByBusinessId');
+Route::post('/products', 'ProductController@store');
+
 
 //customers routes
 Route::get('/customers/business/{businessId}', 'CustomerController@getCustomersByBusinessId');

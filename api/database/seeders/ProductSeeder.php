@@ -20,7 +20,8 @@ class ProductSeeder extends Seeder
             'img' => 'uploads/YIwhJmacSQmN2lPS95NKXXSWcoQ6KAQ4taPYMWgo.png',
             'stock' => 20,
             'sku'=>'Test Product',
-            'category_id' => 3
+            'category_id' => 3,
+            'business_id' => 1
         ]);
 
         DB::table('products')->insert([
@@ -30,7 +31,8 @@ class ProductSeeder extends Seeder
             'img' => 'uploads/8Qs0UQvgWvqNhHQoOuTeu3i3IaEmphnVHDoSiQMM.png',
             'stock' => 20,
             'sku'=>'Test Product',
-            'category_id' => 3
+            'category_id' => 3,
+            'business_id' => 1
 
         ]);
 
@@ -41,7 +43,8 @@ class ProductSeeder extends Seeder
             'img' => 'uploads/tTFfmzy1j98RqM7NiDU1omxbIupxUtP3rUhq8ML8.png',
             'stock' => 20,
             'sku'=>'Test Product',
-            'category_id' => 3
+            'category_id' => 3,
+            'business_id' => 1
 
         ]);
 
@@ -52,7 +55,8 @@ class ProductSeeder extends Seeder
             'img' => 'uploads/JR2NMMAz06X6wx4Q33LaamjVosBzXIKEsm5Ow3UG.png',
             'stock' => 20,
             'sku'=>'Test Product',
-            'category_id' => 1
+            'category_id' => 1,
+            'business_id' => 1
 
         ]);
 
@@ -63,7 +67,8 @@ class ProductSeeder extends Seeder
             'img' => 'uploads/JR2NMMAz06X6wx4Q33LaamjVosBzXIKEsm5Ow3UG.png',
             'stock' => 20,
             'sku'=>'Test Product',
-            'category_id' => 4
+            'category_id' => 4,
+            'business_id' => 1
 
         ]);
 
@@ -74,7 +79,8 @@ class ProductSeeder extends Seeder
             'img' => 'uploads/JR2NMMAz06X6wx4Q33LaamjVosBzXIKEsm5Ow3UG.png',
             'stock' => 20,
             'sku'=>'Test Product',
-            'category_id' => 4
+            'category_id' => 4,
+            'business_id' => 1
 
         ]);
 
@@ -85,7 +91,8 @@ class ProductSeeder extends Seeder
             'img' => 'uploads/JR2NMMAz06X6wx4Q33LaamjVosBzXIKEsm5Ow3UG.png',
             'stock' => 20,
             'sku'=>'Test Product',
-            'category_id' => 4
+            'category_id' => 4,
+            'business_id' => 1
 
         ]);
 
@@ -96,7 +103,8 @@ class ProductSeeder extends Seeder
             'img' => 'uploads/JR2NMMAz06X6wx4Q33LaamjVosBzXIKEsm5Ow3UG.png',
             'stock' => 20,
             'sku'=>'Test Product',
-            'category_id' => 4
+            'category_id' => 4,
+            'business_id' => 1
 
         ]);
 

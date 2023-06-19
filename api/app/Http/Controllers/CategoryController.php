@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -14,6 +15,7 @@ class CategoryController extends Controller
     public function index()
     {
         //
+    
     }
 
     /**
@@ -27,9 +29,18 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCategoryRequest $request)
+    public function store(Request $request)
     {
         //
+        $category = new Category;
+        $category->name = $request->name;
+        $category->url = "None";
+        $category->business_id = $request->business_id;
+
+        if($category->save()){
+            return response()->json($category);
+        }
+      
     }
 
     /**
@@ -66,7 +77,9 @@ class CategoryController extends Controller
 
     public function getCategoriesByBusinessId($businessId)
     {
-        $categories = Category::where('business_id', $businessId)->get();
+        $categories = Category::where('business_id', $businessId)
+        ->orderBy('id','desc')
+        ->get();
 
         return response()->json($categories);
     }

@@ -68,6 +68,7 @@ class CustomerController extends Controller
     {
         $customers = Customer::with('user', 'district', 'customerType')
             ->where('business_id', $businessId)
+            ->orderBy('id','desc')
             ->get();
 
         return response()->json($customers);
