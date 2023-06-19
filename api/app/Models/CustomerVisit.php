@@ -11,6 +11,6 @@ class CustomerVisit extends Model
 
     public function scopeCurrentMonth($query)
     {
-        return $query->whereMonth('created_at', now()->month);
+        return $query->whereMonth('customer_visits.created_at', now()->month);
     }
 }

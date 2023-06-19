@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\CustomerVisit;
 use App\Models\Order;
 use App\Models\OrderProduct;
+use App\Models\Product;
 use App\Models\Report;
 use App\Http\Requests\StoreReportRequest;
 use App\Http\Requests\UpdateReportRequest;
@@ -40,8 +41,13 @@ class ReportController extends Controller {
                     'sales'=>$this->getDailySales($businessId),
                     'visits'=>$this->getDailyVisits($businessId)
                 ],
-                'top_products'=>$this->getTopProducts($businessId)
-            ]
+                'top_products'=>$this->getTopProducts($businessId),
+                'team_sales_vs_visits'=>[
+                    'visits'=>$this->getTeamVisits($businessId),
+                    'sales'=>$this->getTeamSales($businessId)
+                ]
+            ],
+            'data'=>$this->getTopCustomers($businessId)
         ];
     }
 
@@ -285,4 +291,78 @@ class ReportController extends Controller {
         }
         return $data;
     }
+
+    public function getTeamSales($businessId)
+    {
+    
+        $sales = Order::where('orders.business_id', $businessId)
+        ->currentMonth()
+        ->join('users', 'users.id', 'orders.user_id')
+        ->join('team_users', 'users.id', 'team_users.user_id')
+        ->join('teams', 'teams.id', 'team_users.team_id')
+        ->groupBy('teams.id','teams.name','users.id')
+        ->where('orders.status',2 )
+        ->select('teams.id', 'teams.name as team','users.id as user_id', DB::raw('COUNT(orders.id) as sales_count'))
+        ->get();
+
+        $data = [];
+        $categories =[];
+
+        foreach($sales as $sale){
+            array_push($data, $sale->sales_count);
+            array_push($categories, $sale->team);
+        }
+    
+
+        
+    return ['categories'=>$categories, 'data'=> $data];
+   
+    }
+
+    public function getTeamVisits($businessId)
+    {
+    
+        $visits = CustomerVisit::where('customer_visits.business_id', $businessId)
+        ->currentMonth()
+        ->join('users', 'users.id', 'customer_visits.user_id')
+        ->join('team_users', 'users.id', 'team_users.user_id')
+        ->join('teams', 'teams.id', 'team_users.team_id')
+        ->groupBy('teams.id','teams.name','users.id')
+        ->select('teams.id', 'teams.name as team','users.id as user_id', DB::raw('COUNT(customer_visits.id) as visit_count'))
+        ->get();
+
+        $data = [];
+        $categories =[];
+
+        foreach($visits as $visit){
+            array_push($data, $visit->visit_count);
+            array_push($categories, $visit->team);
+        }
+
+        
+        return ['categories'=>$categories, 'data'=> $data];
+   
+    }
+
+  public function getTopCustomers($businessId){
+    $topProducts =DB::table('order_products')
+    ->where('products.business_id', $businessId)
+    ->join('products', 'order_products.product_id', '=', 'products.id')
+    ->join('orders','orders.id','order_products.order_id')
+    ->join('customers','customers.id','orders.customer_id')
+    ->select('customers.id', 'customers.name', DB::raw('SUM(order_products.total_quantity) as total_quantity'), DB::raw('SUM(order_products.total_amount) as total_amount'))
+    ->groupBy( 'customers.id','customers.name')
+    ->orderByDesc('total_quantity')
+    ->limit(6) // Adjust the number of products you want to retrieve
+    ->get();
+
+    $data = [];
+    foreach($topProducts as $topProduct){
+        $customerVIsit = CustomerVisit::where('customer_id', $topProduct->id)->get();
+    
+       array_push($data,["id"=>$topProduct->id,"name"=>$topProduct->name, "total_quantity"=>$topProduct->total_quantity, "total_amount"=>$topProduct->total_amount, "total_visits"=>count($customerVIsit)]);
+    }
+    return $data;
+  }
+
 }

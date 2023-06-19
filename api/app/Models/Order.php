@@ -9,12 +9,12 @@ class Order extends Model {
     use HasFactory;
 
     public function getTotalQuantity() {
-        return $this->order_products()->sum( 'quantity' );
+        return $this->order_products()->sum( 'order_products.total_quantity' );
     }
 
     public function scopeCurrentMonth($query)
     {
-        return $query->whereMonth('created_at', now()->month);
+        return $query->whereMonth('orders.created_at', now()->month);
     }
 
     public function customer() {
