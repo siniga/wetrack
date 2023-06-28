@@ -95,5 +95,27 @@ class UserController extends Controller {
        return response()->json($users);
     }
 
+    public function getUsersByRegion($businessId, $regionId){
+        $users = User::with('orders')
+        ->join('team_users', 'users.id', 'team_users.user_id')
+        ->join('teams', 'teams.id', 'team_users.team_id')
+        ->where('teams.region_id', $regionId)
+        ->where('teams.business_id', $businessId)
+        ->where("users.role",'agent')
+        ->select('users.id', 'users.name')
+        ->get();
+
+    $usersWithCustomerCount = $users->map(function ($user) {
+        $numSales = $user->orders->count(); // Get the count of customers for each user
+    
+        return [
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'num_sales' => $numSales,
+        ];
+    });
+        
+        return response()->json($usersWithCustomerCount);
+    }
    
 }

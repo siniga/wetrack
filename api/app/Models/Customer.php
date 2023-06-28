@@ -34,4 +34,9 @@ class Customer extends Model
     {
         return $this->belongsTo(CustomerType::class);
     }
+
+    public function customer_visits()
+    {
+        return $this->hasMany(CustomerVisit::class);
+    }
 }

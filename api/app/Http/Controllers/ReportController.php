@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\CustomerVisit;
+use App\Models\District;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
+use App\Models\Region;
 use App\Models\Report;
 use App\Http\Requests\StoreReportRequest;
 use App\Http\Requests\UpdateReportRequest;
@@ -45,9 +47,14 @@ class ReportController extends Controller {
                 'team_sales_vs_visits'=>[
                     'visits'=>$this->getTeamVisits($businessId),
                     'sales'=>$this->getTeamSales($businessId)
-                ]
+                ],
+                'top_customer_types'=>$this->getTopCustomerTypes($businessId),
+                // 'top_disctricts'=>$this->getTopDisticts($businessId)
             ],
-            'data'=>$this->getTopCustomers($businessId)
+            'data'=>[
+                'top_customers'=>$this->getTopCustomers($businessId),
+                'top_teams'=>$this->getTopTeams($businessId)
+                ]
         ];
     }
 
@@ -111,6 +118,7 @@ class ReportController extends Controller {
 
         $totalAmount = OrderProduct::join( 'orders', 'orders.id', 'order_products.order_id' )
         ->where( 'orders.business_id', $businessId )
+        ->where('orders.status', 2)
         ->whereBetween( 'orders.created_at', [ $lastMonthStart, $lastMonthEnd ] )
         ->sum( 'total_amount' );
 
@@ -344,25 +352,101 @@ class ReportController extends Controller {
    
     }
 
-  public function getTopCustomers($businessId){
-    $topProducts =DB::table('order_products')
-    ->where('products.business_id', $businessId)
-    ->join('products', 'order_products.product_id', '=', 'products.id')
-    ->join('orders','orders.id','order_products.order_id')
-    ->join('customers','customers.id','orders.customer_id')
-    ->select('customers.id', 'customers.name', DB::raw('SUM(order_products.total_quantity) as total_quantity'), DB::raw('SUM(order_products.total_amount) as total_amount'))
-    ->groupBy( 'customers.id','customers.name')
-    ->orderByDesc('total_quantity')
-    ->limit(6) // Adjust the number of products you want to retrieve
-    ->get();
-
-    $data = [];
-    foreach($topProducts as $topProduct){
-        $customerVIsit = CustomerVisit::where('customer_id', $topProduct->id)->get();
+    public function getTopCustomers($businessId){
+        $topProducts =DB::table('order_products')
+        ->where('products.business_id', $businessId)
+        ->join('products', 'order_products.product_id', '=', 'products.id')
+        ->join('orders','orders.id','order_products.order_id')
+        ->join('customers','customers.id','orders.customer_id')
+        ->select('customers.id', 'customers.name', DB::raw('SUM(order_products.total_quantity) as total_quantity'), DB::raw('SUM(order_products.total_amount) as total_amount'))
+        ->groupBy( 'customers.id','customers.name')
+        ->orderByDesc('total_quantity')
+        ->limit(6) 
+        ->get();
     
-       array_push($data,["id"=>$topProduct->id,"name"=>$topProduct->name, "total_quantity"=>$topProduct->total_quantity, "total_amount"=>$topProduct->total_amount, "total_visits"=>count($customerVIsit)]);
+        $data = [];
+        foreach($topProducts as $topProduct){
+            $customerVIsit = CustomerVisit::where('customer_id', $topProduct->id)->get();
+        
+           array_push($data,["id"=>$topProduct->id,"name"=>$topProduct->name, "total_quantity"=>$topProduct->total_quantity, "total_amount"=>$topProduct->total_amount, "total_visits"=>count($customerVIsit)]);
+        }
+        return $data;
     }
-    return $data;
-  }
 
+    public function getTopCustomerTypes($businessId){
+        $topProducts =DB::table('order_products')
+        ->where('products.business_id', $businessId)
+        ->join('products', 'order_products.product_id', '=', 'products.id')
+        ->join('orders','orders.id','order_products.order_id')
+        ->join('customers','customers.id','orders.customer_id')
+        ->join('customer_types','customer_types.id','customers.customer_type_id')
+        ->select('customer_types.id', 'customer_types.name', DB::raw('SUM(order_products.total_quantity) as total_quantity'), DB::raw('SUM(order_products.total_amount) as total_amount'))
+        ->groupBy( 'customer_types.id','customer_types.name')
+        ->orderByDesc('total_quantity')
+        ->limit(6) 
+        ->get();
+    
+        $data = [];
+        foreach($topProducts as $topProduct){
+           array_push($data,[$topProduct->name, $topProduct->total_quantity]);
+        }
+        return $data;
+    }
+
+    public function getTopTeams($businessId){
+        $topProducts =DB::table('order_products')
+        ->where('products.business_id', $businessId)
+        ->join('products', 'order_products.product_id', '=', 'products.id')
+        ->join('orders','orders.id','order_products.order_id')
+        ->join('users','users.id','orders.user_id')
+        ->join('team_users','users.id','team_users.user_id')
+        ->join('teams','teams.id','team_users.team_id')
+        ->select('teams.id', 'teams.name', DB::raw('SUM(order_products.total_quantity) as total_quantity'), DB::raw('SUM(order_products.total_amount) as total_amount'))
+        ->groupBy( 'teams.id','teams.name')
+        ->orderByDesc('total_quantity')
+        ->limit(6)
+        ->get();
+    
+        $data = [];
+        foreach($topProducts as $topProduct){
+            $customerVIsit = CustomerVisit::where('customer_id', $topProduct->id)->get();
+        
+           array_push($data,["id"=>$topProduct->id,"name"=>$topProduct->name, "total_quantity"=>$topProduct->total_quantity, "total_amount"=>$topProduct->total_amount, "total_visits"=>count($customerVIsit)]);
+        }
+        return $data;
+    }
+
+    public function getTopDisticts($businessId){
+        $regions = DB::table('regions')
+        ->join('districts', 'regions.id', '=', 'districts.region_id')
+        ->join('customers', 'districts.id', '=', 'customers.district_id')
+        ->join('orders', 'customers.id', '=', 'orders.customer_id')
+        ->join('order_products', 'orders.id', '=', 'order_products.order_id')
+        ->select('regions.name as region_name', 'districts.name as district_name', DB::raw('SUM(order_products.total_quantity) as total_quantity_sold'))
+        ->groupBy('regions.id', 'regions.name', 'districts.id', 'districts.name')
+        ->orderBy('regions.name', 'asc')
+        ->orderBy('total_quantity_sold', 'desc')
+        ->get();
+    
+    $result = [];
+    
+    foreach ($regions as $region) {
+        $result[$region->region_name][] = [
+            'name' => $region->district_name,
+            'value' => $region->total_quantity_sold,
+        ];
+    }
+    
+    $finalResult = [];
+    
+    foreach ($result as $regionName => $districts) {
+        $finalResult[] = [
+            'name' => $regionName,
+            'data' => $districts,
+        ];
+    }
+    
+
+       return $finalResult;
+    }
 }

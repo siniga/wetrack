@@ -13,4 +13,14 @@ class CustomerVisit extends Model
     {
         return $query->whereMonth('customer_visits.created_at', now()->month);
     }
+
+    public function customers()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

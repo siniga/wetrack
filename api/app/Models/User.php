@@ -45,7 +45,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
     ];
 
     public function customers()
@@ -66,6 +65,11 @@ class User extends Authenticatable
     public function businesses()
     {
         return $this->belongsTo(Business::class);
+    }
+
+    public function customer_visits()
+    {
+        return $this->hasMany(CustomerVisit::class);
     }
 
 }

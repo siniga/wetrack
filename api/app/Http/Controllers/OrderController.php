@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OrderExport;
 use App\Models\Order;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\OrderProduct;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 class OrderController extends Controller {
     /**
     * Display a listing of the resource.
@@ -43,6 +45,61 @@ class OrderController extends Controller {
         ->get();
 
        return response( [ 'order'=> $orders ], 201 );
+    }
+
+    public function getOrdersByUserid($date, $status){
+        $user = Auth::user();
+
+        $orders = Order::with('products')->has('products')
+        ->where( 'user_id', $user->id)
+        ->where('status', $status)
+        ->whereDate('device_time', $date)
+        ->orderBy( 'id', 'desc' )
+        ->get();
+        
+       return response()->json( $orders );
+    }
+
+    public function getOrderMarkersByBusinessId($businessId, $flag, $userId){
+        //flag to query sales data for one user, region or country
+      
+
+        if($flag == 1){
+            //country
+            $orders = Order::leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
+            ->leftJoin('users', 'orders.user_id', '=', 'users.id')
+            ->join('customer_types','customer_types.id', 'customers.customer_type_id')
+            ->select('orders.id', 'orders.lat', 'orders.lng', 'customer_types.name as customer_type')
+            ->where('orders.business_id', $businessId)
+            ->get();
+        }else{
+            //single sales agent
+            $orders = Order::leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
+            ->leftJoin('users', 'orders.user_id', '=', 'users.id')
+            ->join('customer_types','customer_types.id', 'customers.customer_type_id')
+            ->select('orders.id', 'orders.lat', 'orders.lng', 'customer_types.name as customer_type')
+            ->where('orders.business_id', $businessId)
+            ->where('orders.user_id', $userId)
+            ->get();
+        }
+       
+
+
+        $orderModified =$orders->map(function ($order) {
+            return [
+                'id' => $order->id,
+                'lngLat' => [(float)$order->lng, (float)$order->lat],
+                 'title'=> $order->customer_type
+            ];
+        });
+
+        //add customer lat and longitudes to the orders
+       return response( [ 'order'=> $orderModified ], 200);
+        // {
+        //     id: 7,
+        //     lngLat: [39.2875, -6.793],
+        //     title: "H",
+        //   },
     }
 
     public function store( Request $request ) {
@@ -135,4 +192,12 @@ class OrderController extends Controller {
         // }
 
     }
+
+    public function exportData() 
+   
+    { 
+   
+        return Excel::download(new OrderExport, 'Sales.xlsx');
+    }
+   
 }

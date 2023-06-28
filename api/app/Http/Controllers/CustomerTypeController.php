@@ -14,6 +14,8 @@ class CustomerTypeController extends Controller
     public function index()
     {
         //
+        $types = CustomerType::get();
+        return $types;
     }
 
     /**

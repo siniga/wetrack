@@ -73,4 +73,33 @@ class AuthController extends Controller {
 
         return response( $response, 201 );
     }
+
+    public function loginWithPhoneNum( Request $request ) {
+
+        //check if phone number exist
+        $user = User::where( 'phone_number', '=', $request->phone_number );
+
+        //generate otp
+        // $otpDetails = $this->generateOtp();
+
+        $isPhoneExist = $user->exists();
+        $userData = $user->with('bussinesses')->first();
+        return $user;
+        if ( $isPhoneExist ) {
+            //update user otp
+            // $userData->update( [
+            //     'otp' => $otpDetails[ 0 ],
+            //     'otp_expires_at' => $otpDetails[ 1 ]
+            // ] );
+
+            $token = $userData->createToken( 'authToken' )->plainTextToken;
+            return response()->json( [
+                'user' =>  $userData ,
+                'token' => $token
+            ] );
+
+        } else{
+            return response()->json(['message'=>'user doesnt exist', 'code'=> 404]);
+        }
+    }
 }
