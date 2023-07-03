@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('customer_visits', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('time_spent');
+            $table->unsignedBigInteger('purchase_rejection_reason_id');
+            $table->foreign('purchase_rejection_reason_id')->references('id')->on('purchase_rejection_reasons');
             $table->unsignedBigInteger('customer_id');
             $table->foreign('customer_id')->references('id')->on('customers');
             $table->unsignedBigInteger('user_id');

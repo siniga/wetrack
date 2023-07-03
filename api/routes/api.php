@@ -35,13 +35,19 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
 
 //reports
 Route::get('/reports/business/{businessId}','ReportController@getReports');
+Route::get('/reports/user/{userId}/business/{businessId}', 'UserReportController@getUserReports');
      
 //teams routes
 Route::get('/regions', 'RegionController@index');
 
 //visits
 Route::get('/visits/business/{businessId}','CustomerVisitController@getVisitsByBusinessId');
+Route::get('/visits/markers/business/{businessId}/user/{userId}','CustomerVisitController@getCustomerVisitMarkers');
 Route::post('/visits','CustomerVisitController@store');
+
+
+//maps
+Route::get('maps/sales/business/{businessId}', 'MapController@getSalesMarkers');
 
 //teams routes
 Route::get('/teams/business/{businessId}', 'TeamController@getTeamsByBusinessId');
@@ -49,14 +55,19 @@ Route::post('/teams', 'TeamController@store');
 Route::post('/teams/assign/supervisor', 'TeamController@assignSupervisor');
 
 //users routes
-Route::get('/users/business/{businessId}', 'UserController@index');
+Route::get('/users/business/{businessId}', 'UserController@getusers');
 Route::get('/users/business/{businessId}/region/{regionId}', 'UserController@getUsersByRegion');
+Route::get('/users/visits/business/{businessId}/region/{regionId}', 'UserController@getUsersVisits');
 Route::get('/users/{id}', 'UserController@show');
 Route::post('/users', 'UserController@store');
 Route::put('/users/{user}', 'UserController@update');
 Route::post('/users/update-password', 'UserController@updatePassword');
 Route::get('/users/team/{teamId}/role/{role}', 'UserController@getUsersByteamId');
 Route::get('/users/role/{role}/business/{businessId}', 'UserController@getUsersByRoleId');
+Route::post('/users/assign-team','UserController@assignUserToTeam');
+
+//agents
+Route::get('/agents/business/{businessId}','UserController@getAgentsByBusinessId');
 
 //orders routes
 Route::get('/orders', 'OrderController@index');
@@ -78,6 +89,7 @@ Route::post('/categories', 'CategoryController@store');
 Route::get('/products/category/{categoryId}', 'ProductController@getProductsByCategoryId');
 Route::get('/products/business/{businessId}', 'ProductController@getProductsByBusinessId');
 Route::post('/products', 'ProductController@store');
+Route::delete('/products/{productId}', 'ProductController@destroy');
 
 //customers routes
 Route::get('/customers/business/{businessId}', 'CustomerController@getCustomersByBusinessId');

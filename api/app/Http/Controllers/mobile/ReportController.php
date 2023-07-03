@@ -23,7 +23,7 @@ class ReportController extends Controller {
             'total_num_customers' =>$this->getUserTotalNumCustomers( $user ),
             'total_num_orders'=>$this->getTotalNumOrders($user),
             'total_revenue'=>$this->getTotalRevenue($user),
-            'total_credits' =>$this->getTotalCreditAmount($user)
+            'total_credits' =>$this->getTotalCreditAmount($user),
         ] );
     }
 
@@ -74,4 +74,7 @@ class ReportController extends Controller {
 
         return $totalAmount;
     }
+
+
+
 }

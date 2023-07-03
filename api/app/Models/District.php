@@ -11,7 +11,7 @@ class District extends Model
 
     public function customers()
     {
-        return $this->hasMany(Customer::class);
+        return $this->hasMany(Customer::class,'district_id');
     }
 
     public function regions()

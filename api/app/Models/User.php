@@ -69,7 +69,7 @@ class User extends Authenticatable
 
     public function customer_visits()
     {
-        return $this->hasMany(CustomerVisit::class);
+        return $this->hasMany(CustomerVisit::class,'user_id');
     }
 
 }

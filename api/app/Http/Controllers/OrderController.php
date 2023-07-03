@@ -31,7 +31,7 @@ class OrderController extends Controller {
     */
 
     public function getByStatusBusinessId( $status, $bid ) {
-        $orders = Order::with( 'customer','user' )
+        $orders = Order::with( 'customers','user' )
         ->where( 'business_id', $bid )
         ->where( 'status', $status )
         ->get();
@@ -40,7 +40,8 @@ class OrderController extends Controller {
     }
 
     public function getOrderByBusinessId( $bid ) {
-        $orders = Order::with( 'customer','user' )
+        
+        $orders = Order::with( 'customers','user' )
         ->where( 'business_id', $bid )
         ->get();
 

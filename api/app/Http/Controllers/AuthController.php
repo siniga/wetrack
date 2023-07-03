@@ -42,6 +42,7 @@ class AuthController extends Controller {
 
     public function login( Request $request ) {
 
+       
         //if email is set allow user to login with email
         //otherwise allow user to login with phone number
 
@@ -52,10 +53,11 @@ class AuthController extends Controller {
 
         //get user where email is equal to requested email
         $user = User::where( 'email', $fields[ 'email' ] )
-        ->join( 'businesses', 'users.business_id', '=', 'businesses.id' )
+        ->join( 'businesses', 'users.business_id', 'businesses.id' )
         ->select( 'users.*', 'businesses.name as business_name' )
         ->first();
 
+ 
         //check password
         if ( !$user || !Hash::check( $fields[ 'password' ], $user->password ) ) {
 
@@ -64,7 +66,7 @@ class AuthController extends Controller {
             ], 401 );
         }
 
-        $token = $user->createToken( 'itargetToken' )->plainTextToken;
+        $token = $user->createToken( 'wetrack' )->plainTextToken;
 
         $response = [
             'user' => $user,

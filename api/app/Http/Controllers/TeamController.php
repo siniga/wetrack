@@ -77,7 +77,7 @@ class TeamController extends Controller {
     public function getTeamsByBusinessId( $businessId ) {
         $teams = Team::with( 'region' )
         ->with( 'users', function($query) {
-            $query->where('role', 'supervisor');
+            // $query->where('role', 'supervisor');
         })
         ->where( 'business_id', $businessId )
         ->orderBy( 'id', 'desc' )

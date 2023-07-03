@@ -7,14 +7,42 @@ use App\Http\Requests\StoreCustomerVisitRequest;
 use App\Http\Requests\UpdateCustomerVisitRequest;
 use Illuminate\Http\Request;
 
-class CustomerVisitController extends Controller
-{
+class CustomerVisitController extends Controller {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    * Display a listing of the resource.
+    */
+
+    public function index() {
+
+    }
+
+    public function getCustomerVisitMarkers($businessId, $userId) {
+      //filter by business id
+        
+        if($userId == 0){
+          //query all visitations based on business id
+        $custVisits = CustomerVisit::with('customers.customer_types')
+        ->where('business_id', $businessId)
+        ->get();
+        }else{
+             //query based on user id
+        $custVisits = CustomerVisit::with('customers.customer_types')
+        ->where('user_id', $userId)
+        ->where('business_id', $businessId)
+        ->get();
+        }
+       
+
+        $custVisitsModified =$custVisits->map(function ($custVisit) {
+            return [
+                'id' => $custVisit->id,
+                'lngLat' => [(float)$custVisit->lng, (float)$custVisit->lat],
+                'title'=> $custVisit->customers->customer_types->name,
+            ];
+        });
+
+
+        return response()->json( $custVisitsModified );
     }
 
     /**
@@ -76,9 +104,9 @@ class CustomerVisitController extends Controller
     }
 
     public function getVisitsByBusinessId($businessId){
-        $customerVisit = CustomerVisit::where('business_id', $businessId)
+        $customerVisit = CustomerVisit::where('business_id', $businessId )
         ->get();
 
-        return response()->json($customerVisit);
+        return response()->json( $customerVisit );
     }
 }

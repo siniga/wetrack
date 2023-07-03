@@ -17,7 +17,7 @@ class Order extends Model {
         return $query->whereMonth('orders.created_at', now()->month);
     }
 
-    public function customer() {
+    public function customers() {
         return $this->belongsTo( Customer::class, 'customer_id' );
     }
 
